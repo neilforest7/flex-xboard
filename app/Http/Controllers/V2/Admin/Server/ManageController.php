@@ -15,8 +15,21 @@ class ManageController extends Controller
 {
     public function getNodes(Request $request)
     {
-        $servers = collect(ServerService::getAllServers())->map(function ($item) {
-            $item['groups'] = ServerGroup::whereIn('id', $item['group_ids'])->get(['name', 'id']);
+        $servers = ServerService::getAllServers()->map(function ($item) {
+            // 确保 group_ids 是数组
+            $groupIds = $item['group_ids'];
+            if (!is_array($groupIds)) {
+                // 如果不是数组，尝试解码为数组
+                if (is_string($groupIds)) {
+                    $decodedIds = json_decode($groupIds, true);
+                    // 确保解码后是数组
+                    $groupIds = is_array($decodedIds) ? $decodedIds : [];
+                } else {
+                    $groupIds = [];
+                }
+            }
+            
+            $item['groups'] = ServerGroup::whereIn('id', $groupIds)->get(['name', 'id']);
             $item['parent'] = $item->parent;
             return $item;
         });

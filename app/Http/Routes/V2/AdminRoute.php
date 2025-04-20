@@ -6,6 +6,7 @@ use App\Http\Controllers\V2\Admin\PlanController;
 use App\Http\Controllers\V2\Admin\Server\GroupController;
 use App\Http\Controllers\V2\Admin\Server\RouteController;
 use App\Http\Controllers\V2\Admin\Server\ManageController;
+use App\Http\Controllers\V2\Admin\ServerBatchController;
 use App\Http\Controllers\V2\Admin\OrderController;
 use App\Http\Controllers\V2\Admin\UserController;
 use App\Http\Controllers\V2\Admin\StatController;
@@ -71,6 +72,16 @@ class AdminRoute
             ], function ($router) {
                 $router->get('/getNodes', [ManageController::class, 'getNodes']);
                 $router->post('/sort', [ManageController::class, 'sort']);
+            });
+            
+            // 批量节点管理接口
+            $router->group([
+                'prefix' => 'server/batch'
+            ], function ($router) {
+                $router->post('/create', [ServerBatchController::class, 'batchCreate']);
+                $router->put('/update', [ServerBatchController::class, 'batchUpdate']);
+                $router->delete('/delete', [ServerBatchController::class, 'batchDelete']);
+                $router->get('/templates', [ServerBatchController::class, 'templates']);
             });
 
             // 节点更新接口
