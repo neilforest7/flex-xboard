@@ -15,16 +15,11 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'api/v1/*', 'api/v2/*'],
+    'paths' => ['api/*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'http://31.22.111.34:3000',
-        'http://31.22.111.50:3000',
-        // 保留原有的允许来源，如果需要
-        '*'
-    ],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
@@ -34,6 +29,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 
 ];

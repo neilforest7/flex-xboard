@@ -17,16 +17,13 @@ class PlanService
     }
 
     /**
-     * 获取所有可销售的订阅计划列表
-     * 条件：show 和 sell 为 true，且容量充足
+     * 获取所有订阅计划列表
      *
      * @return Collection
      */
     public function getAvailablePlans(): Collection
     {
-        return Plan::where('show', true)
-            ->where('sell', true)
-            ->orderBy('sort')
+        return Plan::orderBy('sort')
             ->get()
             ->filter(function ($plan) {
                 return $this->hasCapacity($plan);
