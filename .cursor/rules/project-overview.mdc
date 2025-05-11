@@ -1,0 +1,57 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 项目概述
+
+本项目是一个基于 Laravel 框架的应用程序。以下是一些关键目录和文件的概述，以帮助理解项目结构和主要功能。
+
+## 核心目录结构
+
+*   **`app/`**: 包含应用程序的核心代码。
+    *   `[app/Console/Commands](mdc:app/Console/Commands)`: 自定义 Artisan 命令。
+    *   `[app/Http/Controllers](mdc:app/Http/Controllers)`: HTTP 控制器，处理进入的请求。注意 `V1` 和 `V2` 子目录，表明 API 可能存在版本控制。
+    *   `[app/Models](mdc:app/Models)`: Eloquent ORM 模型，与数据库表交互。
+    *   `[app/Services](mdc:app/Services)`: 存放业务逻辑服务类。
+    *   `[app/Jobs](mdc:app/Jobs)`: 队列任务。
+    *   `[app/Providers](mdc:app/Providers)`: 服务提供者，用于注册和引导服务。
+*   **`bootstrap/`**: 包含框架启动脚本和缓存文件。
+*   **`config/`**: 存放所有应用程序的配置文件，例如 `[config/app.php](mdc:config/app.php)` 和 `[config/database.php](mdc:config/database.php)`。
+*   **`database/`**: 数据库相关文件。
+    *   `[database/migrations](mdc:database/migrations)`: 数据库迁移文件，用于管理数据库表结构。
+    *   `[database/seeders](mdc:database/seeders)`: 数据填充文件，用于向数据库中填充初始数据。
+    *   `[database/factories](mdc:database/factories)`: 模型工厂，用于测试和数据填充时生成模型实例。
+*   **`public/`**: Web 服务器的文档根目录，包含入口文件 `[public/index.php](mdc:public/index.php)` 和前端静态资源。
+*   **`resources/`**: 存放视图、原始资源文件 (如 SASS, JavaScript) 和语言文件。
+    *   `[resources/views](mdc:resources/views)`: Blade 模板文件。
+    *   `[resources/js](mdc:resources/js)`: JavaScript 源码。
+    *   `[resources/sass](mdc:resources/sass)`: SASS 源码。
+    *   `[resources/lang](mdc:resources/lang)`: 语言文件，用于国际化。
+*   **`routes/`**: 定义应用程序的所有路由。
+    *   `[routes/web.php](mdc:routes/web.php)`: Web 界面路由。
+    *   `[routes/api.php](mdc:routes/api.php)`: API 路由。
+*   **`storage/`**: 存放编译后的 Blade 模板、基于文件的会话、文件缓存以及框架生成的其他文件。
+*   **`tests/`**: 包含自动化测试，如单元测试和功能测试。
+*   **`vendor/`**: Composer 依赖项。
+
+## 主题和插件
+
+*   **`theme/`**: 包含项目的主题，例如 `[theme/v2board](mdc:theme/v2board)` 和 `[theme/Xboard](mdc:theme/Xboard)`。这表明系统支持多主题或可定制界面。
+*   **`plugins/`**: 可能包含自定义插件或模块，用于扩展核心功能。
+
+## 关键配置文件和脚本
+
+*   **`[artisan](mdc:artisan)`**: Laravel 的命令行接口工具。
+*   **`[composer.json](mdc:composer.json)`**: 定义 PHP 依赖。
+*   **`[package.json](mdc:package.json)`**: 定义 Node.js 依赖 (通常用于前端构建)。
+*   **`[.env](mdc:.env)`**: 环境变量配置文件 (实际配置应在 `.env` 文件中，该文件不应提交到版本库)。`[.env.example](mdc:.env.example)` 是一个示例文件。
+*   **`[Dockerfile](mdc:Dockerfile)`**: 用于构建 Docker 镜像的指令。
+*   **`.docker/`**: 包含 Docker Compose 配置及相关数据。
+*   **`.github/workflows/`**: GitHub Actions 工作流，用于 CI/CD。
+
+## API 版本
+
+项目似乎包含 API 版本控制，具体体现在 `app/Http/Controllers/V1` 和 `app/Http/Controllers/V2` 以及 `app/Http/Routes/V1` 和 `app/Http/Routes/V2` 目录。开发时请注意目标 API 版本。
+
+这个概述应该能帮助你快速了解项目的基本结构和关键组件。
