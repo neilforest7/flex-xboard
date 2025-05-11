@@ -25,6 +25,9 @@ class CommController extends Controller
             'commission_distribution_l2' => admin_setting('commission_distribution_l2'),
             'commission_distribution_l3' => admin_setting('commission_distribution_l3')
         ];
+        $commission_withdraw_limit_yuan = admin_setting('commission_withdraw_limit', 100);
+        $commission_withdraw_limit_amount = (int)($commission_withdraw_limit_yuan * 100);
+        $data['commission_withdraw_limit_amount'] = $commission_withdraw_limit_amount;
         return $this->success($data);
     }
 
