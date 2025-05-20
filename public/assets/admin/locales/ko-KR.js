@@ -441,8 +441,8 @@ window.XBOARD_TRANSLATIONS['ko-KR'] = {
           },
           "expire": {
             "label": "제한 기간",
-            "placeholder": "제한 기간을 시간 단위로 입력",
-            "description": "등록 제한 기간(시간)"
+            "placeholder": "제한 기간을 분 단위로 입력",
+            "description": "등록 제한 기간(분)"
           }
         },
         "passwordLimit": {
@@ -457,8 +457,8 @@ window.XBOARD_TRANSLATIONS['ko-KR'] = {
           },
           "expire": {
             "label": "잠금 기간",
-            "placeholder": "잠금 기간을 시간 단위로 입력",
-            "description": "계정 잠금 기간(시간)"
+            "placeholder": "잠금 기간을 분 단위로 입력",
+            "description": "계정 잠금 기간(분)"
           }
         }
       }
@@ -796,6 +796,10 @@ window.XBOARD_TRANSLATIONS['ko-KR'] = {
       "surge": {
         "title": "Surge 템플릿",
         "description": "Surge의 구독 템플릿 형식 설정"
+      },
+      "surfboard": {
+        "title": "Surfboard 템플릿",
+        "description": "Surfboard의 구독 템플릿 형식 설정"
       }
     }
   },
