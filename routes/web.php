@@ -90,3 +90,57 @@ Route::get('/' . admin_setting('secure_path', admin_setting('frontend_admin_path
 Route::get('/' . (admin_setting('subscribe_path', 's')) . '/{token}', [\App\Http\Controllers\V1\Client\ClientController::class, 'subscribe'])
     ->middleware('client')
     ->name('client.subscribe');
+
+// Fallback Route for SPA
+Route::get('/{any?}', function (Request $request) {
+    // 复制根路由 '/' 的主题加载逻辑
+    if (admin_setting('app_url') && admin_setting('safe_mode_enable', 0)) {
+        if ($request->server('HTTP_HOST') !== parse_url(admin_setting('app_url'))['host']) {
+            abort(403);
+        }
+    }
+
+    $theme = admin_setting('frontend_theme', 'Xboard');
+    $themeService = new \App\Services\ThemeService(); // 确保使用完整的命名空间
+
+    try {
+        if (!$themeService->exists($theme)) {
+            if ($theme !== 'Xboard') {
+                Log::warning('Theme not found, switching to default theme', ['theme' => $theme]);
+                $theme = 'Xboard';
+                admin_setting(['frontend_theme' => $theme]);
+            }
+            $themeService->switch($theme);
+        }
+
+        if (!$themeService->getThemeViewPath($theme)) {
+            throw new Exception('主题视图文件不存在');
+        }
+        
+        $publicThemePath = public_path('theme/' . $theme);
+        if (!File::exists($publicThemePath)) {
+            $themePath = $themeService->getThemePath($theme);
+            if (!$themePath || !File::copyDirectory($themePath, $publicThemePath)) {
+                throw new Exception('主题初始化失败');
+            }
+            Log::info('Theme initialized in public directory', ['theme' => $theme]);
+        }
+
+        $renderParams = [
+            'title' => admin_setting('app_name', 'Xboard'),
+            'theme' => $theme,
+            'version' => app(\App\Services\UpdateService::class)->getCurrentVersion(), // 确保使用完整的命名空间
+            'description' => admin_setting('app_description', 'Xboard is best'),
+            'logo' => admin_setting('logo'),
+            'theme_config' => $themeService->getConfig($theme)
+        ];
+        return view('theme::' . $theme . '.dashboard', $renderParams);
+    } catch (Exception $e) {
+        Log::error('Theme rendering failed for fallback route', [
+            'theme' => $theme,
+            'path' => $request->path(),
+            'error' => $e->getMessage()
+        ]);
+        abort(500, '主题加载失败');
+    }
+})->where('any', '^(?!api/|storage/)(?!.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$).*');
