@@ -47,6 +47,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @property int|null $u 上行流量
  * @property int|null $d 下行流量
  * @property int|null $total 总流量
+ * @property-read array|null $load_status 负载状态（包含CPU、内存、交换区、磁盘信息）
  */
 class Server extends Model
 {
@@ -56,6 +57,7 @@ class Server extends Model
     public const TYPE_VMESS = 'vmess';
     public const TYPE_TUIC = 'tuic';
     public const TYPE_SHADOWSOCKS = 'shadowsocks';
+    public const TYPE_ANYTLS = 'anytls';
     public const TYPE_SOCKS = 'socks';
     public const TYPE_NAIVE = 'naive';
     public const TYPE_HTTP = 'http';
@@ -93,6 +95,7 @@ class Server extends Model
         self::TYPE_VMESS,
         self::TYPE_TUIC,
         self::TYPE_SHADOWSOCKS,
+        self::TYPE_ANYTLS,
         self::TYPE_SOCKS,
         self::TYPE_NAIVE,
         self::TYPE_HTTP,
@@ -148,7 +151,9 @@ class Server extends Model
         self::TYPE_SHADOWSOCKS => [
             'cipher' => ['type' => 'string', 'default' => null],
             'obfs' => ['type' => 'string', 'default' => null],
-            'obfs_settings' => ['type' => 'array', 'default' => null]
+            'obfs_settings' => ['type' => 'array', 'default' => null],
+            'plugin' => ['type' => 'string', 'default' => null],
+            'plugin_opts' => ['type' => 'string', 'default' => null]
         ],
         self::TYPE_HYSTERIA => [
             'version' => ['type' => 'integer', 'default' => 2],
@@ -173,13 +178,37 @@ class Server extends Model
                     'server_name' => ['type' => 'string', 'default' => null],
                     'allow_insecure' => ['type' => 'boolean', 'default' => false]
                 ]
-            ]
+            ],
+            'hop_interval' => ['type' => 'integer', 'default' => null]
         ],
         self::TYPE_TUIC => [
             'version' => ['type' => 'integer', 'default' => 5],
             'congestion_control' => ['type' => 'string', 'default' => 'cubic'],
             'alpn' => ['type' => 'array', 'default' => ['h3']],
             'udp_relay_mode' => ['type' => 'string', 'default' => 'native'],
+            'tls' => [
+                'type' => 'object',
+                'fields' => [
+                    'server_name' => ['type' => 'string', 'default' => null],
+                    'allow_insecure' => ['type' => 'boolean', 'default' => false]
+                ]
+            ]
+        ],
+        self::TYPE_ANYTLS => [
+            'padding_scheme' => [
+                'type' => 'array',
+                'default' => [
+                    "stop=8",
+                    "0=30-30",
+                    "1=100-400",
+                    "2=400-500,c,500-1000,c,500-1000,c,500-1000,c,500-1000",
+                    "3=9-9,500-1000",
+                    "4=500-1000",
+                    "5=500-1000",
+                    "6=500-1000",
+                    "7=500-1000"
+                ]
+            ],
             'tls' => [
                 'type' => 'object',
                 'fields' => [
@@ -402,6 +431,20 @@ class Server extends Model
                     return Helper::getServerKey($this->created_at, 16);
                 }
                 return null;
+            }
+        );
+    }
+
+    /**
+     * 负载状态访问器
+     */
+    protected function loadStatus(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $type = strtoupper($this->type);
+                $serverId = $this->parent_id ?: $this->id;
+                return Cache::get(CacheKey::get("SERVER_{$type}_LOAD_STATUS", $serverId));
             }
         );
     }
