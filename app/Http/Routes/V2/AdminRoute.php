@@ -17,9 +17,7 @@ use App\Http\Controllers\V2\Admin\KnowledgeController;
 use App\Http\Controllers\V2\Admin\PaymentController;
 use App\Http\Controllers\V2\Admin\SystemController;
 use App\Http\Controllers\V2\Admin\ThemeController;
-use App\Http\Controllers\V2\Admin\UpdateController;
 use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Support\Facades\Route;
 
 class AdminRoute
 {
@@ -208,12 +206,12 @@ class AdminRoute
             });
 
             // Update
-            $router->group([
-                'prefix' => 'update'
-            ], function ($router) {
-                $router->get('/check', [UpdateController::class, 'checkUpdate']);
-                $router->post('/execute', [UpdateController::class, 'executeUpdate']);
-            });
+            // $router->group([
+            //     'prefix' => 'update'
+            // ], function ($router) {
+            //     $router->get('/check', [UpdateController::class, 'checkUpdate']);
+            //     $router->post('/execute', [UpdateController::class, 'executeUpdate']);
+            // });
 
             // Theme
             $router->group([
