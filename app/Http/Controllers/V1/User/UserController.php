@@ -102,6 +102,17 @@ class UserController extends Controller
             return $this->fail([400, __('The user does not exist')]);
         }
         $user['avatar_url'] = 'https://cdn.v2ex.com/gravatar/' . md5($user->email) . '?s=64&d=identicon';
+        
+        // 检查用户是否有过往订单
+        $hasHistoryOrder = Order::where('user_id', $user->id)->exists();
+        $user['no_history_order'] = (int)!$hasHistoryOrder;
+        
+        // 检查是否为新用户（无订单且注册时间在试用时长内）
+        $tryOutHours = (int)admin_setting('try_out_hour', 1);
+        $registrationTimeLimit = $user->created_at + ($tryOutHours * 3600);
+        $isWithinTrialPeriod = time() < $registrationTimeLimit;
+        $user['newcomer'] = (int)(!$hasHistoryOrder && $isWithinTrialPeriod);
+        
         return $this->success($user);
     }
 
@@ -146,6 +157,7 @@ class UserController extends Controller
         $user['subscribe_url'] = Helper::getSubscribeUrl($user['token']);
         $userService = new UserService();
         $user['reset_day'] = $userService->getResetDay($user);
+        $user['is_try_out_plan'] = (int)($user->plan_id && $user->plan_id == (int)admin_setting('try_out_plan_id'));
         return $this->success($user);
     }
 
