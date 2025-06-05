@@ -107,9 +107,10 @@ class UserController extends Controller
         $hasHistoryOrder = Order::where('user_id', $user->id)->exists();
         $user['no_history_order'] = (int)!$hasHistoryOrder;
         
-        // 检查是否为新用户（无订单且注册时间在试用时长内）
+        // 检查是否为新用户（无订单且注册时间在规定时长内）
         $tryOutHours = (int)admin_setting('try_out_hour', 1);
-        $registrationTimeLimit = $user->created_at + ($tryOutHours * 3600);
+        $checkHours = $tryOutHours > 1 ? $tryOutHours : 168;
+        $registrationTimeLimit = $user->created_at + ($checkHours * 3600);
         $isWithinTrialPeriod = time() < $registrationTimeLimit;
         $user['newcomer'] = (int)(!$hasHistoryOrder && $isWithinTrialPeriod);
         
