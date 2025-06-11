@@ -103,16 +103,28 @@ class UserController extends Controller
         }
         $user['avatar_url'] = 'https://cdn.v2ex.com/gravatar/' . md5($user->email) . '?s=64&d=identicon';
         
-        // 检查用户是否有过往订单
-        $hasHistoryOrder = Order::where('user_id', $user->id)->exists();
-        $user['no_history_order'] = (int)!$hasHistoryOrder;
+        // 检查用户是否有过往订单（仅统计已完成的订单）
+        $hasCompletedOrder = false;
+        try {
+            $hasCompletedOrder = Order::where('user_id', $request->user()->id)
+                ->where('status', Order::STATUS_COMPLETED)
+                ->exists();
+        } catch (\Exception $e) {
+            // 数据库查询异常时，默认认为没有订单
+            \Log::error('Failed to check user completed orders: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id,
+                'exception' => $e
+            ]);
+            $hasCompletedOrder = false;
+        }
+        $user['no_history_order'] = (int)!$hasCompletedOrder;
         
         // 检查是否为新用户（无订单且注册时间在规定时长内）
         $tryOutHours = (int)admin_setting('try_out_hour', 1);
         $checkHours = $tryOutHours > 1 ? $tryOutHours : 168;
         $registrationTimeLimit = $user->created_at + ($checkHours * 3600);
         $isWithinTrialPeriod = time() < $registrationTimeLimit;
-        $user['newcomer'] = (int)(!$hasHistoryOrder && $isWithinTrialPeriod);
+        $user['newcomer'] = (int)(!$hasCompletedOrder && $isWithinTrialPeriod);
         
         return $this->success($user);
     }
