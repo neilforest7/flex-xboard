@@ -46,9 +46,13 @@ class PaymentService
             $notifyUrl = $this->config['notify_domain'] . $parseUrl['path'];
         }
         
+        // Generate return URL using site URL from admin settings
+        $siteUrl = admin_setting('app_url');
+        $returnUrl = $siteUrl ? rtrim($siteUrl, '/') . '/dashboard/order/' . $order['trade_no'] : url('/dashboard/order/' . $order['trade_no']);
+        
         return $this->payment->pay([
             'notify_url' => $notifyUrl,
-            'return_url' => url('/#/order/' . $order['trade_no']),
+            'return_url' => $returnUrl,
             'trade_no' => $order['trade_no'],
             'total_amount' => $order['total_amount'],
             'user_id' => $order['user_id'],
